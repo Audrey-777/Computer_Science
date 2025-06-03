@@ -221,6 +221,7 @@ for animal in animals:
 - 多态允许用统一的接口处理不同类型的对象。
 
 # Binary Search-二分查找
+## 模板
 ```python
 def binary_search(arr, target):
     lo, hi = 0, len(arr) - 1
@@ -259,22 +260,6 @@ def middleNode(self, head: Optional[ListNode]) -> Optional[ListNode]: #找到中
 	        return slow
 ```
 # Tree-树🌲
-## 定义🌲的类
-1. 二叉树
-	```Python
-	class TreeNode:
-		     def __init__(self, val=0, left=None, right=None):
-		         self.val = val
-		         self.left = left
-		         self.right = right
-	```
-2. 多叉树
-	```Python
-	class Node: #建立树的节点类，包含：值&子节点  
-	    def __init__(self, val):  
-	        self.val = val  
-	        self.children = []  
-	```
 ## 递归遍历
 1. 前序遍历
 	```python
@@ -358,8 +343,21 @@ class Solution:
         right = self.sortedArrayToBST(nums[m + 1:])  
         return TreeNode(nums[m], left, right)
 ```
-
-## Heap-堆
+## 最近公共祖先
+```python
+class Solution:  
+    def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':  
+        if not root or root == p or root == q:  
+            return root  
+        left = self.lowestCommonAncestor(root.left, p, q)  
+        right = self.lowestCommonAncestor(root.right, p, q)  
+        if not left:  
+            return right  
+        if not right:  
+            return left  
+        return root
+```
+# Heap-堆
 
 #### 堆的数组表示
 - 对于索引 `i` 的节点：
@@ -374,8 +372,7 @@ class Solution:
    / \
   4   5
   ```
-### 3. Python 中的堆用法
-Python 提供内置模块 `heapq`，默认实现**最小堆**。它基于列表操作，非常简单易用。
+
 #### 基本操作
 | 操作          | 方法                              | 功能            | 时间复杂度    |
 | ----------- | ------------------------------- | ------------- | -------- |
@@ -391,47 +388,9 @@ Python 提供内置模块 `heapq`，默认实现**最小堆**。它基于列表�
 - **无环检查**：堆操作不会引入环（不像链表）。
 - **动态调整**：插入和删除后，堆会自动调整以保持堆性质。
 - **索引从 0 开始**：`heap[0]` 是堆顶。
-# 小function的模板们
-## 判断质数
-```Python
-def is_prime_number(num):  
-    if num < 2:  
-        return False  
-    for i in range(2,int(num ** 0.5) + 1):  
-        if num % i == 0:  
-            return False  
-    return True
-```
-## defaultdict
-```Python
-from collections import defaultdict
-
-# 创建一个默认值为 int 的 defaultdict
-# 默认值为 0
-default_dict = defaultdict(int)
-
-# 创建一个默认值为 list 的 defaultdict
-# 默认值为 []
-default_dict_list = defaultdict(list)
-
-# 创建一个默认值为 str 的 defaultdict
-# 默认值为 ''
-default_dict_str = defaultdict(str)
-```
 
 # Summary
-## 0. 通用复杂度与常见术语
-
-- **时间复杂度 (Time Complexity)**：操作次数随输入规模增长的上界，常见有 O(1)、O(log n)、O(n)、O(n log n)、O(n²)。
-    
-- **空间复杂度 (Space Complexity)**：额外使用内存随输入规模增长的上界。
-    
-- **均摊分析**：对某些摊销操作（如动态数组扩容、摊还插入堆），平均到每次操作的成本。
-    
-
----
-
-## 1. 二分查找（修正模板）
+## 1. 二分查找
 
 ```python
 def binary_search(arr, target):
@@ -448,9 +407,7 @@ def binary_search(arr, target):
 ```
 
 - **坑点**：闭区间 `[lo, hi]` vs. 开区间 `[lo, hi)`。
-    
 - **变体**：找第一个 ≥ target、最后一个 ≤ target 等，可在判断分支里微调边界。
-    
 
 ---
 
@@ -529,56 +486,66 @@ def merge_sort(arr):
 用于处理连通性／集合合并问题（如岛屿计数、网络连通）
 
 ```python
-class UnionFind:
-    def __init__(self, elements):
-        # parent 字典：存储每个元素的父节点
-        # 初始时，每个元素的父节点就是它自己，表示各自是一个独立的集合
-        self.parent = {element: element for element in elements}
-        # size 字典：存储每个根节点所代表的集合的大小
-        # 初始时，每个集合的大小都是 1
-        self.size = {element: 1 for element in elements}
-        # 记录当前最大的集合大小，方便最后直接获取结果
-        self.max_size = 1
-
-    def find(self, i):
-        # `find` 操作的目的是找到元素 i 所在集合的代表元素（根节点）
-        # 路径压缩优化：在查找过程中，将路径上的所有节点的父节点直接指向根节点
-        if self.parent[i] == i:
-            # 如果当前节点的父节点就是它自己，说明它就是根节点
-            return i
-        # 递归地查找父节点，并进行路径压缩
-        self.parent[i] = self.find(self.parent[i])
-        return self.parent[i]
-
-    def union(self, i, j):
-        # `union` 操作的目的是合并元素 i 和元素 j 所在的两个集合
-        # 1. 找到 i 和 j 各自的根节点
-        root_i = self.find(i)
-        root_j = self.find(j)
-
-        # 2. 如果根节点相同，说明它们已经在同一个集合中，无需合并
-        if root_i != root_j:
-            # 3. 按大小合并优化：将小集合的根节点连接到大集合的根节点上
-            # 这样可以保持树的深度较小，提高后续 find 操作的效率
-            if self.size[root_i] < self.size[root_j]:
-                root_i, root_j = root_j, root_i  # 交换，确保 root_i 总是较大集合的根
-
-            self.parent[root_j] = root_i  # 将小集合的根连接到大集合的根
-            self.size[root_i] += self.size[root_j]  # 更新大集合的大小
-
-            # 更新当前找到的最大集合大小
-            self.max_size = max(self.max_size, self.size[root_i])
-            return True # 表示成功合并
-        return False # 表示没有合并（已经在同一个集合中）
+class UnionFind:  
+    def __init__(self, elements):  
+        self.parent = {element: element for element in elements}  
+        self.size = {element: 1 for element in elements}  
+  
+    def find_parent(self, i):  
+        if self.parent[i] == i:  
+            return i  
+        self.parent[i] = self.find_parent(self.parent[i])  
+        return self.parent[i]  
+  
+    def union(self, i, j):  
+        root_i = self.find_parent(i)  
+        root_j = self.find_parent(j)  
+        if root_i != root_j:  
+            if self.size[root_i] < self.size[root_j]:  
+                root_i, root_j = root_j, root_i  
+            self.parent[root_j] = root_i  
+            self.size[root_i] += self.size[root_j]  
+            return True  
+        return False
 ```
 
 - **路径压缩**（`find` 里递归压平） + **按秩合并** → 接近 O(α(n)) ≈ O(1)。
 ---
 
-## 6. 图（Graph）算法基础
-
----
-
+## 6. 前缀树（Trie）
+```python
+class Node:  
+    __slots__ = 'son', 'end'  
+    def __init__(self):  
+        self.son = {} #self.son[root] = node  
+        self.end = False  
+  
+class Trie:  
+    def __init__(self):  
+        self.root = Node() #初始化一个node  
+  
+    def insert(self, word: str) -> None:  
+        curr = self.root  
+        for c in word:  
+            if c not in curr.son:  
+                curr.son[c] = Node() #形成新的分叉  
+            curr = curr.son[c]  
+        curr.end = True  
+  
+    def find(self, word: str) -> int:  
+        curr = self.root  
+        for c in word:  
+            if c not in curr.son:  
+                return 0 #道不同不相为谋  
+            curr = curr.son[c]  
+        return 2 if curr.end else 1 # 2: perfectly matched; 1: prefix matched  
+  
+    def search(self, word: str) -> bool:  
+        return self.find(word) == 2  
+  
+    def startsWith(self, prefix: str) -> bool:  
+        return self.find(prefix) != 0
+```
 ## 7. 动态规划（DP）
 
 - **五部曲**：
@@ -603,8 +570,57 @@ class UnionFind:
         for i in range(3, n+1):
             dp[i] = dp[i-1] + dp[i-2]
         return dp[n]
-    ```
+```
+## 8. 前缀和
+```python
+class NumArray:  
+    def __init__(self, nums: List[int]):  
+        s = [0] * （len(nums) + 1） #s[0] = 0利于递推：s[i + 1] = s[i] + x  
+        for i, x in enumerate(nums):  
+            s[i + 1] = s[i] + x  
+        self.sum = s  
+  
+    def sumRange(self, left: int, right: int) -> int:  
+        return self.sum[right + 1] - self.sum[left]
+```
+二叉树版本
+```python
+class Solution:  
+    def pathSum(self, root: Optional[TreeNode], targetSum: int) -> int:  
+        cnt = defaultdict(int)  # 根节点到node处，前缀和为curr_sum的node个数  
+        cnt[0] = 1  # 记得初始化：前缀和为0的有1个（包括进前缀和本身即为targetSum的情况）  
+        self.ans = 0  
+  
+        def dfs(node, curr_sum) -> None:  
+            if node is None:  
+                return  
+            curr_sum += node.val  
+            self.ans += cnt[curr_sum - targetSum]  
+            cnt[curr_sum] += 1  
+            
+            dfs(node.left, curr_sum)  
+            dfs(node.right, curr_sum)  
+            cnt[curr_sum] -= 1  # backtracking  
+            
+        dfs(root, 0)  
+        return self.ans
+```
 
+## 9. 滑动窗口
+最长不重复子串
+```python
+def sliding_window(s: str) -> int:
+    seen = set()
+    left = 0
+    res = 0
+    for right in range(len(s)):
+        while s[right] in seen:
+            seen.remove(s[left])
+            left += 1
+        seen.add(s[right])
+        res = max(res, right - left + 1)
+    return res
+```
 # 经典图算法
 ## Prim(MST, OOP)
 ```python
@@ -706,3 +722,32 @@ def topological_sort(num_vertices, edges):
     else:
         return [] # 图中存在环
 ```
+
+# 小function的模板们
+## 判断质数
+```Python
+def is_prime_number(num):  
+    if num < 2:  
+        return False  
+    for i in range(2,int(num ** 0.5) + 1):  
+        if num % i == 0:  
+            return False  
+    return True
+```
+## defaultdict
+```Python
+from collections import defaultdict
+
+# 创建一个默认值为 int 的 defaultdict
+# 默认值为 0
+default_dict = defaultdict(int)
+
+# 创建一个默认值为 list 的 defaultdict
+# 默认值为 []
+default_dict_list = defaultdict(list)
+
+# 创建一个默认值为 str 的 defaultdict
+# 默认值为 ''
+default_dict_str = defaultdict(str)
+```
+
