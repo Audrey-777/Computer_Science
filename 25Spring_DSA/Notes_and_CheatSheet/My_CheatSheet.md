@@ -1,3 +1,37 @@
+# 准备
+## Pycharm调整：
+1. 实现按住 ctrl +滑动鼠标滚轮实现代码窗口字体大小调整：
+	**File** 一>**Settings** 一>**Editor**一>**General**里 的**Mouse Control**把**Change font size with Ctrl+Mouse Wheel**打上对勾，点击**OK**即可
+2. 确保编译文件是current file
+# 一些错误总结：
+## Compile Error：
+1. 这个多半是变量名字打错了，或者多打；：之类的，这个好查，一般本地都运行不了。
+2. OJ的pylint是静态检查，有时候报的compile error不对。解决方法有两种，如下：
+​		1）第一行加# pylint: skip-file
+​		2）方法二：如果函数内使用全局变量（变量类型是immutable，如int），则需要在程序最开始声明一下。如果是全局变量是list类型，则不受影响。
+## Runtime Error：
+1. 指针越界，比如长度为5（index为0，1，2，3，4）的数组你去获取list[5]，但是注意list[-5]是合法的（index可以为-1，-2，-3，-4，-5）。
+2. 数组开太大了，比如开到1000000000（9个0）就会
+3. 递归爆栈：这个用以下代码解决
+```python
+from sys import setrecurisonlimit
+setrecursionlimit(10000)#python 默认 200
+```
+4. 输入读取错误，一般是输入没读完就exit（）    （所以要谨慎使用这个函数）
+5. 除以0，检查一下变量是不是可以是0
+## Wrong Answer
+​	这个需要好好审一遍代码
+​	如果没有逻辑性的错误，就查一下边界值，比如0啊1啊什么的，很可能在这些地方出错
+​	如果还不行，就仔细审题，看看哪个地方理解错了
+## Presentation Error
+​	只遇到过一次，就是该输出空行的时候没输出空行
+## Time Limit Exceeded
+1. 死循环（这种在BFS类里容易碰到，要注意visited的逻辑是否正确）
+2. 算法问题（注意每次读题时注意数据量，以便快速确定算法）
+3. 卡常数，这种情况用pypy3就可以了，或者再优化一下代码，去除一些鸡肋的O（n）操作
+## Memory Limit Exceeded
+​	数组开太大了，一般DP难题会遇到，这时候就要考虑压缩空间了。
+​	还有就是BFS的时候queue可能会超，要考虑进堆的数据的优化
 # Stack
 ## 字符串解码
 **输入:** `s = "3[a]2[bc]"`
@@ -123,105 +157,9 @@ print(Dog.get_species())  # 输出: Canis familiaris
 print(Dog.info())     # 输出: Dogs are loyal animals.
 ```
 
-#### 方法类型：
-1. **实例方法**：
-   - 需要 `self` 参数，操作实例属性。
-   - 如 `bark(self)`。
-
-2. **类方法**：
-   - 用 `@classmethod` 装饰器，接收 `cls`（类本身）作为参数。
-   - 如 `get_species(cls)`。
-
-3. **静态方法**：
-   - 用 `@staticmethod` 装饰器，不需要 `self` 或 `cls`，与类逻辑相关但不依赖实例或类状态。
-   - 如 `info()`。
-
----
-
-## 6. 封装（Encapsulation）
-封装是将数据和操作数据的方法绑定在一起，并控制外部访问的权限。
-
-### 示例：私有属性
-```python
-class Dog:
-    def __init__(self, name, age):
-        self.name = name        # 公开属性
-        self.__age = age        # 私有属性（双下划线）
-
-    def get_age(self):          # 获取私有属性的方法
-        return self.__age
-
-    def set_age(self, age):     # 修改私有属性的方法
-        if age > 0:
-            self.__age = age
-
-dog = Dog("Buddy", 3)
-print(dog.name)      # 输出: Buddy
-print(dog.get_age()) # 输出: 3
-# print(dog.__age)   # 错误！无法直接访问私有属性
-dog.set_age(4)
-print(dog.get_age()) # 输出: 4
-```
-
-- **`__age`**：双下划线表示**私有属性**，外部无法直接访问。
-- **getter/setter 方法**：通过方法控制对私有属性的访问和修改。
-
----
-
-## 7. 继承（Inheritance）
-继承允许一个类（子类）继承另一个类（父类）的属性和方法。
-### 示例：继承
-```python
-class Animal:
-    def __init__(self, name):
-        self.name = name
-
-    def speak(self):
-        print("I can speak!")
-
-class Dog(Animal):  # Dog 继承 Animal
-    def bark(self):
-        print(f"{self.name} barks!")
-
-dog = Dog("Buddy")
-dog.speak()  # 输出: I can speak!（继承自 Animal）
-dog.bark()   # 输出: Buddy barks!（Dog 自己的方法）
-```
-
-- **`Dog(Animal)`**：`Dog` 类继承了 `Animal` 类。
-- 子类可以直接使用父类的属性和方法，也可以添加自己的方法。
-
-#### 方法重写（Override）
-```python
-class Dog(Animal):
-    def speak(self):  # 重写父类方法
-        print(f"{self.name} says Woof!")
-
-dog = Dog("Buddy")
-dog.speak()  # 输出: Buddy says Woof!（覆盖了父类的 speak）
-```
-
----
-
-## 8. 多态（Polymorphism）
-多态是指不同类的对象可以用相同的方式调用方法，但表现出不同的行为。
-
-### 示例：多态
-```python
-class Cat(Animal):
-    def speak(self):
-        print(f"{self.name} says Meow!")
-
-animals = [Dog("Buddy"), Cat("Whiskers")]
-for animal in animals:
-    animal.speak()  # 输出: Buddy says Woof! 和 Whiskers says Meow!
-```
-
-- **`speak()`**：不同的类**实现了同一个方法名，但行为不同。**
-- 多态允许用统一的接口处理不同类型的对象。
-
-# Binary Search-二分查找
-## 模板
+# 双指针
+## Binary Search-二分查找
+### 模板
 ```python
 def binary_search(arr, target):
     lo, hi = 0, len(arr) - 1
@@ -234,6 +172,29 @@ def binary_search(arr, target):
         else:
             hi = mid - 1         # 中点偏大，舍弃右半区
     return -1                     # 未找到
+```
+
+## 数据流中的中位数
+```python
+class MedianFinder:  
+    def __init__(self):  
+        self.left = [] #左堆：用负值做最大堆  
+        self.right = [] #右堆：最小堆  
+  
+    def addNum(self, num: int) -> None:  
+        if len(self.left) == len(self.right): #左右等长，加入左堆  
+            temp = -heapq.heappushpop(self.right, num) #取并且pop包括num在内的右侧所有元素最小值  
+            heapq.heappush(self.left, temp) #加到左堆，更新完成。  
+        else:  
+            temp = -heapq.heappushpop(self.left, -num)  
+            heapq.heappush(self.right, temp)  
+  
+    def findMedian(self) -> float:  
+        if len(self.left) > len(self.right): #奇数个数  
+            ans = -self.left[0]  
+        else:  
+            ans = (-self.left[0] + self.right[0]) / 2 #因为是数据流所以不可以pop否则影响后续。  
+        return ans
 ```
 # 链表
 小工具：
@@ -357,6 +318,57 @@ class Solution:
             return left  
         return root
 ```
+## 扩展二叉树（建树读数据参考）
+```python
+class Node:
+    def __init__(self, val):
+        self.val = val
+        self.left = None
+        self.right = None
+
+def build_tree(s, index):
+    # 如果当前字符为'.'，表示空结点，返回None，并将索引后移一位
+    if s[index] == '.':
+        return None, index + 1
+    # 否则创建一个结点
+    node = Node(s[index])
+    index += 1
+    # 递归构造左子树
+    node.left, index = build_tree(s, index)
+    # 递归构造右子树
+    node.right, index = build_tree(s, index)
+    return node, index
+
+def inorder(node, res):
+    if node is None:
+        return
+    inorder(node.left, res)
+    res.append(node.val)
+    inorder(node.right, res)
+
+def postorder(node, res):
+    if node is None:
+        return
+    postorder(node.left, res)
+    postorder(node.right, res)
+    res.append(node.val)
+
+def main():
+    s = input().strip()
+    root, _ = build_tree(s, 0)
+    
+    in_res = []
+    inorder(root, in_res)
+    
+    post_res = []
+    postorder(root, post_res)
+    
+    print("".join(in_res))
+    print("".join(post_res))
+
+if __name__ == '__main__':
+    main()
+```
 # Heap-堆
 
 #### 堆的数组表示
@@ -431,6 +443,88 @@ dq.appendleft(x); dq.append(x)
 dq.popleft(); dq.pop()
 ```
 
+### Shunting-yard算法
+```python
+中序转后序Shunting Yard：
+
+基本步骤：
+
+1. 初始化运算符栈和输出栈为空。
+2. 从左到右遍历中缀表达式的每个符号。
+   - 如果是操作数（数字），则将其添加到输出栈。
+   - 如果是左括号，则将其推入运算符栈。
+   - 如果是运算符：
+     - 如果运算符的优先级大于运算符栈顶的运算符，或者运算符栈顶是左括号，则将当前运算符推入运算符栈。
+     - 否则，将运算符栈顶的运算符弹出并添加到输出栈中，直到满足上述条件（或者运算符栈为空）。
+     - 将当前运算符推入运算符栈。
+   - 如果是右括号，则将运算符栈顶的运算符弹出并添加到输出栈中，直到遇到左括号。将左括号弹出但不添加到输出栈中。
+3. 如果还有剩余的运算符在运算符栈中，将它们依次弹出并添加到输出栈中。
+4. 输出栈中的元素就是转换后的后缀表达式。
+
+```python
+def turn(s):
+    fuhao={'+':1,'-':1,'*':2,'/':2}
+    stack=[]
+    ans=[]
+    num=''
+    for i in s:
+        if i in '0123456789.':
+            num+=i
+        else:
+            if num:
+                ans.append(num)
+                num=''
+            if i in '+-*/':
+                while stack and stack[-1] in '+-*/' and fuhao[i]<=fuhao[stack[-1]]:
+                    ans.append(stack.pop())
+                stack.append(i)
+            elif i=='(':
+                stack.append(i)
+            elif i==')':
+                while stack and stack[-1]!='(':
+                    ans.append(stack.pop())
+                stack.pop()
+    if num:
+        ans.append(num)
+    while stack:
+        ans.append(stack.pop())
+    return ' '.join(str(i) for i in ans)
+case=int(input())
+for _ in range(case):
+    s=input()
+    print(turn(s))
+
+```
+### 单调栈例题：柱状图中的最大矩形
+```python
+class Solution:  
+    def largestRectangleArea(self, heights: List[int]) -> int:  
+        l = len(heights)  
+  
+        left = [-1] * l #找到i处左边最早高度比height[i]小的地方  
+        stack = []  
+        for i, h in enumerate(heights):  
+            while stack and h <= heights[stack[-1]]: #访问栈顶。若没能比i处的高度小，就把它pop掉。  
+                stack.pop()  
+            if stack: #如果还有，就取到最后一个入栈的（最靠近i的），记录它的index  
+                left[i] = stack[-1]  
+            stack.append(i)  
+  
+        right = [l] * l #找到i处右边最早高度比height[i]小的地方  
+        stack.clear()  
+        for i in range(l - 1, -1, -1): #倒着遍历  
+            h = heights[i]  
+            while stack and h <= heights[stack[-1]]:  
+                stack.pop()  
+            if stack:  
+                right[i] = stack[-1]  
+            stack.append(i)  
+  
+        ans = 0  
+        for h, l, r in zip(heights, left, right):  
+            ans = max(ans, h * (r - l - 1))  
+        return ans
+```
 ---
 
 ## 3. 哈希表（Hash Table）
@@ -621,8 +715,206 @@ def sliding_window(s: str) -> int:
         res = max(res, right - left + 1)
     return res
 ```
+
+## 10. Backtracking
+path为列表
+```python
+def backtrack(path, 选择列表):
+    if 满足结束条件:
+        结果.append(path[:])
+        return
+    for 选择 in 选择列表:
+        # 做选择
+        path.append(选择)
+        # 递归
+        backtrack(path, 新的选择列表)
+        # 撤销选择
+        path.pop()
+```
+path为字符串
+```python
+def backtracking(k: int, path: str) -> None:  
+    if k == l:  
+        ans.append(path)  
+        return  
+    for ch in dic[int(digits[k])]:  
+        path = path + ch  
+        backtracking(k + 1, path)  
+        path = path[:-1:]  
+  
+  
+path = ''  
+backtracking(0, path)
+```
 # 经典图算法
-## Prim(MST, OOP)
+## Dijkstra
+```python
+import heapq
+def dijkstra(start):
+    dist = {u: float('inf') for u in graph}
+    dist[start] = 0
+    hq = [(0, start)]
+    while hq:
+        d, u = heapq.heappop(hq)
+        if d > dist[u]:
+	        continue
+        for v, w in graph[u]:   # graph[u] 存 (邻点, 权重)
+            if dist[v] > d + w:
+                dist[v] = d + w
+                heapq.heappush(hq, (dist[v], v))
+    return dist[]
+```
+记录路径：
+```python
+while priority_queue:  
+        curr_dist, curr_pos = heapq.heappop(priority_queue)  
+        if curr_dist > distance[curr_pos]:  
+            continue  
+  
+        if curr_pos == end:  
+            break  
+  
+        for neighbor, weight in maps[curr_pos]:  
+            nd = curr_dist + weight  
+            if nd < distance[neighbor]:  
+                distance[neighbor] = nd  
+                path[neighbor] = path[curr_pos] + f'->({weight})->' + neighbor  
+                heapq.heappush(priority_queue, (nd, neighbor))  
+  
+    return path[end]  
+```
+## 无向图判环
+```python
+def dfs(u, parent):
+    visited[u] = True # 1. 标记当前节点 u 为已访问
+    for v in graph[u]: # 2. 遍历节点 u 的所有邻居 v
+        if not visited[v]: # 3. 如果邻居 v 没有被访问过
+            if dfs(v, u): # 4. 递归地对 v 进行 DFS 搜索，并传入 u 作为 v 的父节点
+                return True  # 如果从 v 开始的子树中发现了环，就直接返回 True
+        elif v != parent: # 5. 如果邻居 v 已经被访问过，并且 v 不是 u 的父节点
+            return True  # 6. 说明找到了一个环
+    return False # 7. 如果遍历完所有邻居都没有发现环，则返回 False
+```
+
+## 有向图判环&Topological Sorting
+### Kahn's
+适用：【有向无环图DAG】
+```python
+from collections import defaultdict, deque
+
+def topological_sort(num_vertices, edges):
+    adj_list = defaultdict(list)
+    in_degree = [0] * num_vertices
+
+    # 构建邻接列表并计算入度
+    for u, v in edges:
+        adj_list[u].append(v)
+        in_degree[v] += 1
+
+    queue = deque()
+    # 将所有入度为 0 的顶点加入队列
+    for i in range(num_vertices):
+        if in_degree[i] == 0:
+            queue.append(i)
+
+    topological_order = []
+    
+    # 循环处理队列
+    while queue:
+        u = queue.popleft()
+        topological_order.append(u)
+
+        # 遍历 u 的邻接顶点
+        for v in adj_list[u]:
+            in_degree[v] -= 1
+            if in_degree[v] == 0:
+                queue.append(v)
+
+    # 判断是否有环
+    if len(topological_order) == num_vertices:
+        return topological_order
+    else:
+        return [] # 图中存在环
+```
+
+## 最小生成树（MST）
+这样定义<mark>安全的边</mark>：它的一端是生成树中的顶点，另一端是还不在生成树中的顶点。这保证了构建的树不会出现循环。
+### Kruskal
+```python
+class DisjointSet:
+    def __init__(self, num_vertices):
+        self.parent = list(range(num_vertices))
+        self.rank = [0] * num_vertices
+
+    def find(self, x):
+        if self.parent[x] != x:
+            self.parent[x] = self.find(self.parent[x])
+        return self.parent[x]
+
+    def union(self, x, y):
+        root_x = self.find(x)
+        root_y = self.find(y)
+
+        if root_x != root_y:
+            if self.rank[root_x] < self.rank[root_y]:
+                self.parent[root_x] = root_y
+            elif self.rank[root_x] > self.rank[root_y]:
+                self.parent[root_y] = root_x
+            else:
+                self.parent[root_x] = root_y
+                self.rank[root_y] += 1
+
+
+def kruskal(graph):
+    num_vertices = len(graph)
+    edges = []
+
+    # 构建边集
+    for i in range(num_vertices):
+        for j in range(i + 1, num_vertices):
+            if graph[i][j] != 0:
+                edges.append((i, j, graph[i][j]))
+
+    # 按照权重排序
+    edges.sort(key=lambda x: x[2])
+
+    # 初始化并查集
+    disjoint_set = DisjointSet(num_vertices)
+
+    # 构建最小生成树的边集
+    minimum_spanning_tree = []
+
+    for edge in edges:
+        u, v, weight = edge
+        if disjoint_set.find(u) != disjoint_set.find(v):
+            disjoint_set.union(u, v)
+            minimum_spanning_tree.append((u, v, weight))
+
+    return minimum_spanning_tree
+```
+### Prim
+```python
+import heapq
+
+visited = {0}  
+heap = graph[0]  
+heapq.heapify(heap)  
+total_cost = 0  
+edges_used = 0  
+  
+while heap and edges_used < n - 1:  
+    distance, node = heapq.heappop(heap)  # 根据distance排序的最小堆  
+    if node not in visited:  
+        visited.add(node)  
+        total_cost += distance  
+        edges_used += 1  
+        for neighbor_distance, neighbor in graph[node]:  
+            if neighbor not in visited:  
+                heapq.heappush(heap, (neighbor_distance, neighbor))
+return total_cost
+```
+
+### Prim(MST, OOP)
 ```python
 import heapq
 
@@ -664,66 +956,27 @@ class Graph:
 
 ```
 
-## Dijkstra
+## Floyd-Warshall
 ```python
-import heapq
-def dijkstra(start):
-    dist = {u: float('inf') for u in graph}
-    dist[start] = 0
-    hq = [(0, start)]
-    while hq:
-        d, u = heapq.heappop(hq)
-        if d > dist[u]:
-	        continue
-        for v, w in graph[u]:   # graph[u] 存 (邻点, 权重)
-            if dist[v] > d + w:
-                dist[v] = d + w
-                heapq.heappush(hq, (dist[v], v))
-    return dist[]
+def floyd_warshall(graph):
+    n = len(graph)
+    dist = [[float('inf')] * n for _ in range(n)]
+
+    for i in range(n):
+        for j in range(n):
+            if i == j:
+                dist[i][j] = 0
+            elif j in graph[i]:
+                dist[i][j] = graph[i][j]
+
+    for k in range(n):
+        for i in range(n):
+            for j in range(n):
+                dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])
+
+    return dist
 ```
-
-## Topological Sorting
-### Kahn's
-适用：【有向无环图DAG】
-```python
-from collections import defaultdict, deque
-
-def topological_sort(num_vertices, edges):
-    adj_list = defaultdict(list)
-    in_degree = [0] * num_vertices
-
-    # 构建邻接列表并计算入度
-    for u, v in edges:
-        adj_list[u].append(v)
-        in_degree[v] += 1
-
-    queue = deque()
-    # 将所有入度为 0 的顶点加入队列
-    for i in range(num_vertices):
-        if in_degree[i] == 0:
-            queue.append(i)
-
-    topological_order = []
-    
-    # 循环处理队列
-    while queue:
-        u = queue.popleft()
-        topological_order.append(u)
-
-        # 遍历 u 的邻接顶点
-        for v in adj_list[u]:
-            in_degree[v] -= 1
-            if in_degree[v] == 0:
-                queue.append(v)
-
-    # 判断是否有环
-    if len(topological_order) == num_vertices:
-        return topological_order
-    else:
-        return [] # 图中存在环
-```
-
-# 小function的模板们
+# 小function与模板们
 ## 判断质数
 ```Python
 def is_prime_number(num):  
@@ -751,3 +1004,18 @@ default_dict_list = defaultdict(list)
 default_dict_str = defaultdict(str)
 ```
 
+## try...except...
+```python
+while True:  
+    try:  
+        n = int(input())  
+        graph = Graph(n) #初始化一个Graph实例  
+        for i in range(n):  
+            row = list(map(int, input().split()))  
+            for j in range(i + 1, n):  
+                graph.add_edge(i, j, row[j])  
+        print(graph.prim())  
+  
+    except EOFError:  
+        break
+```
